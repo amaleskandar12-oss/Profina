@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profina Task Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* ==================== 
+           1. Colors & Core Styles 
+           ==================== */
+        :root {
+            --primary-blue: #0056b3;       
+            --soft-purple: #8854d0;        /* Soft purple for headers */
+            --light-blue: #4dabf5;         
+            --baby-blue: #e3f2fd;          
+            --bg-gray: #f8f9fa;            
+            --text-dark: #333333;          
+            --white: #ffffff;
+            --danger: #d9534f;             /* Red for Notes and Bad examples */
+            --success: #27ae60;            /* Green for Good examples */
+            --gray-highlight: #e9ecef;     /* Gray background highlight */
+            --orange-highlight: #fff3cd;   /* Yellow/Orange background highlight */
+            --orange-border: #ffeeba;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ==================== 
+           2. Header 
+           ==================== */
+        header {
+            background-color: var(--white);
+            padding: 15px 30px;
+            border-bottom: 3px solid var(--primary-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .project-title {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ==================== 
+           3. Split Layout Structure 
+           ==================== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+        }
+
+        /* --- LEFT PANEL: INSTRUCTIONS --- */
+        .instructions-panel {
+            width: 55%; 
+            background-color: var(--baby-blue);
+            padding: 30px;
+            border-right: 1px solid #bddefc;
+            position: sticky;
+            top: 60px; 
+            height: calc(100vh - 60px); 
+            overflow-y: auto; 
+        }
+
+        .instructions-content {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        /* Typography & Custom Colors */
+        .instructions-content h1 { 
+            font-size: 1.8rem; 
+            color: var(--primary-blue); 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px; 
+            margin-top: 0; 
+        }
+
+        /* Soft Purple Headers */
+        .instructions-content h2 { 
+            font-size: 1.4rem; 
+            color: var(--soft-purple); 
+            margin-top: 30px; 
+            border-left: 4px solid var(--soft-purple); 
+            padding-left: 10px; 
+        }
+
+        /* Note Headers Red */
+        .instructions-content h2.note-red, .instructions-content strong.note-red {
+            color: var(--danger) !important;
+            border-left-color: var(--danger) !important;
+        }
+
+        .instructions-content h3 { font-size: 1.1rem; color: #003d80; margin-top: 25px; font-weight: 700; }
+        .instructions-content ul, .instructions-content ol { padding-left: 20px; margin-bottom: 15px; }
+        .instructions-content li { margin-bottom: 8px; }
+        .instructions-content strong { color: #000; font-weight: 600; }
+        .instructions-content p { margin-bottom: 15px; }
+
+        /* Specific text styles requested */
+        .small-note {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .text-good { color: var(--success); font-weight: bold; }
+        .text-bad { color: var(--danger); font-weight: bold; }
+
+        .highlight-gray {
+            background-color: var(--gray-highlight);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .highlight-orange {
+            background-color: var(--orange-highlight);
+            border: 1px solid var(--orange-border);
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        /* Collapsible Styles */
+        .collapsible-btn {
+            background-color: #f1f1f1;
+            color: var(--soft-purple); /* Matching headers */
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid #ddd;
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .collapsible-btn:hover, .collapsible-btn.active { background-color: #e2e6ea; border-color: #ccc; }
+        .collapsible-btn:after { content: '\002B'; font-size: 1.5rem; color: #777; font-weight: bold; }
+        .collapsible-btn.active:after { content: "\2212"; }
+        .collapsible-content {
+            padding: 0 18px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #fafafa;
+            border-left: 3px solid var(--soft-purple);
+            margin-bottom: 15px;
+        }
+
+        /* Table Styling */
+        .instruction-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9rem; }
+        .instruction-table th, .instruction-table td { border: 1px solid #ddd; padding: 12px; text-align: left; vertical-align: top; }
+        .instruction-table th { background-color: var(--soft-purple); color: white; }
+        .bg-bad { background-color: #fff5f5; border-left: 3px solid var(--danger); }
+        .bg-good { background-color: #f0fff4; border-left: 3px solid var(--success); }
+
+        /* --- RIGHT PANEL: TASK --- */
+        .task-panel {
+            width: 45%;
+            padding: 30px;
+            background-color: var(--white);
+        }
+
+        .category-badge {
+            background-color: var(--baby-blue);
+            color: var(--primary-blue);
+            padding: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary-blue);
+            text-align: center;
+        }
+
+        h2.section-title {
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--baby-blue);
+            padding-bottom: 10px;
+        }
+
+        /* ==================== 
+           4. Input Styles 
+           ==================== */
+        .step-container {
+            background: var(--white);
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: border-color 0.3s;
+        }
+
+        .step-container:hover { border-color: var(--light-blue); }
+
+        .step-label {
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: block;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        input[type="text"], textarea, input[type="date"], input[type="file"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #fafafa;
+            transition: 0.3s;
+            font-family: 'Roboto', sans-serif;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            border-color: var(--primary-blue);
+            background-color: var(--white);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+
+        textarea { resize: vertical; min-height: 120px; }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 15px;
+            background-color: var(--baby-blue);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-wrapper input { margin-right: 12px; margin-top: 3px; width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-wrapper label { cursor: pointer; line-height: 1.4; }
+
+        .add-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            margin-left: auto;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: 0.3s;
+        }
+
+        .add-btn:hover { background-color: #003d80; transform: scale(1.1); }
+
+        /* ==================== 
+           5. Documentation Block 
+           ==================== */
+        .doc-entry {
+            border: 1px dashed var(--primary-blue);
+            padding: 20px;
+            background: #fcfcfc;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            position: relative;
+        }
+        
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        label.small-label { font-size: 0.85rem; color: #555; margin-bottom: 5px; display: block; font-weight: 500; }
+
+        /* ==================== 
+           6. Footer 
+           ==================== */
+        footer {
+            background-color: var(--white);
+            border-top: 2px solid #ddd;
+            padding: 40px;
+            margin-top: auto;
+        }
+
+        .footer-content { max-width: 100%; }
+        .comment-section { margin-bottom: 30px; }
+        .comment-box { position: relative; }
+        .comment-box input { padding-right: 50px; height: 50px; }
+
+        .send-btn {
+            position: absolute;
+            right: 10px; top: 10px;
+            background: none; border: none;
+            color: var(--primary-blue);
+            cursor: pointer; font-size: 1.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn-submit {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 40px;
+            border: none; border-radius: 6px;
+            font-size: 1.1rem; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 6px rgba(0,86,179,0.3);
+            font-weight: bold;
+        }
+        .btn-submit:hover { background-color: #004494; }
+
+        .btn-clear {
+            background-color: transparent;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 1rem; cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+        .btn-clear:hover { background-color: var(--danger); color: white; }
+
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; }
+            .instructions-panel { width: 100%; position: static; height: auto; border-right: none; border-bottom: 1px solid #ddd; }
+            .task-panel { width: 100%; }
+            .doc-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <p class="project-title">Projects / 🗂️ Profina SEC filings Q\A Data collection</p>
+    </header>
+
+    <div class="main-container">
+
+        <aside class="instructions-panel">
+            <div class="instructions-content">
+                
+                <h1>Welcome to 🗂️ Profina!</h1>
+                
+                <h2>Overview</h2>
+                <p>In Profina, you will create question-answer pairs based on real public company filings. The project focuses on using official SEC EDGAR 10-K and 10-Q reports published from October 2023 onwards to generate factual, verifiable, and structured questions and answers.</p>
+                
+                <p class="small-note">If you have any questions after reading the instructions, please feel free to leave a comment in the comments section.</p>
+
+                <h2>✨Project goals</h2>
+                <p>The goal is to use these question-answer pairs to train AI models to perform better in finance. Prompts will be presented to the model, and its responses will be compared against the accurate, documented answers you provide, so the rater does not need to refer back to the original filings. Therefore, your answers must be 100% correct, precise, and fully align with the project guidelines.</p>
+
+                <h2>🔑 Step-by-Step Guide to Finding 10-K & 10-Q Reports</h2>
+                
+                <h3>Step 1: Open the SEC EDGAR Filings Portal</h3>
+                <p>➡️ SEC.gov | Search Filings.</p>
+
+                <h3>Step 2: Search for a Company</h3>
+                <p>Go to Search Filings ➡ Click on Full Text Search ➡ Search for any company you prefer</p>
+
+                <h3>Step 3: Filter Filing Category and Date</h3>
+                <ul>
+                    <li>From the Filing Category dropdown, select “All annual, quarterly, and current reports”.</li>
+                    <li>Under Filed Date Range, choose “Custom”.</li>
+                    <li>Set Filed From to October 1, 2023.</li>
+                </ul>
+
+                <h3>Step 4: Select an Entity</h3>
+                <p>Scroll down to the “Entity” section on the left.</p>
+                <p>Open the dropdown menu:</p>
+                <ul>
+                    <li>If only one entity appears, select it.</li>
+                    <li>If multiple entities appear, select one entity only (any one).</li>
+                </ul>
+
+                <h3>Step 5: Select the Filing Form</h3>
+                <p>Under the selected entity, locate the “Form” dropdown menu.</p>
+                <p>Select either:</p>
+                <ul>
+                    <li>Form 10-K, or</li>
+                    <li>Form 10-Q</li>
+                </ul>
+                
+                <p><strong class="note-red">Notes:</strong><br>
+                It is normal for only one of these forms to be available.<br>
+                If neither 10-K nor 10-Q appears, deselect the entity and choose a different one (if available), or start over and search for a different company.</p>
+                <p>Repeat the steps until you find an eligible filing.</p>
+
+                <h3>Step 6: Choose the Filing You Will Work On</h3>
+                <p>From the results list, select one filing you will work on (Make sure the filing date is October 1, 2023 or more recent) ➡ Click Open Document</p>
+
+                <h3>Step 7: Additional Filings for Category C Tasks (If Assigned)</h3>
+                <p>If you are assigned a Category C task:</p>
+                <p>You may repeat the same steps above to open additional filings. You can compare filings from different companies, or open multiple filings for the same company. You may use 2 up to 40 different reports in total.</p>
+
+                <hr>
+
+                <h2 class="note-red">Note</h2>
+                <h3>Do Not Include PII (Personally Identifiable Information)</h3>
+                <p>Both the prompt and the response must not ask for, reference, or include personally identifiable information (PII).</p>
+
+                <p><strong>Allowed information:</strong><br>
+                You may reference only information explicitly stated in the SEC filing, including:</p>
+                <ul>
+                    <li>Full names of executives, directors, or officers as listed in the filing</li>
+                    <li>Company email addresses if explicitly mentioned in the report</li>
+                    <li>Company headquarters addresses as disclosed in the filing</li>
+                    <li>Titles, roles, and organizational information related to the company</li>
+                </ul>
+
+                <p><strong>Not allowed:</strong><br>
+                Any personal or contact-level information that is not explicitly written in the filing, including:</p>
+                <ul>
+                    <li>Personal email addresses</li>
+                    <li>Phone numbers</li>
+                    <li>Personal home addresses</li>
+                    <li>National IDs or similar personal data</li>
+                </ul>
+                <p>This applies even if the information:</p>
+                <ul>
+                    <li>Can be found on Google</li>
+                    <li>Appears on the company’s website</li>
+                    <li>Is publicly known elsewhere</li>
+                </ul>
+
+                <h2>✏️ Prompt Categories</h2>
+                <p>For each task, you will be assigned a prompt category: A, B, or C.</p>
+                <p>You must strictly follow the prompt category assigned to you.</p>
+                
+                <div class="highlight-orange">
+                    Check your assigned category at the top-right corner to know exactly which type of prompt you should work on.
+                </div>
+                
+                <p>Make sure to check the assigned category every time you start working on a new task, as the prompt category may change from one task to another.</p>
+
+                <h3>Category A: simple questions about a single document</h3>
+                <p>In Category A, you will create simple, direct questions based on a single SEC filing (10-K or 10-Q).</p>
+                <p><strong>How to work on a Category A task:</strong></p>
+                <ul>
+                    <li>Choose one filing (10-K or 10-Q) and read it carefully.</li>
+                    <li>Identify a clear fact, and write a question that asks directly about that fact.</li>
+                    <li>Write the answer exactly as it appears in the filing. Do not change the facts or numbers, do not round up or down, and do not exaggerate. Accuracy is essential.</li>
+                </ul>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>
+                What was Coca‑Cola’s total net operating revenue for the fiscal year ending December 31, 2024?</p>
+                <p><strong>Rational:</strong><br>
+                It asks for a single, direct factual figure (total net operating revenue) that can be found in one filing only (the company’s 10-K).</p>
+
+                <h3>2. Category B: complex questions about a single document</h3>
+                <p>In Category B, you will create more challenging questions based on a single SEC filing (10-K or 10-Q). The answer requires combining multiple facts from different sections of the filing, making inferences, or computing numbers not readily available in the report.</p>
+                <p><strong>How to work on a Category B task:</strong></p>
+                <ul>
+                    <li>Choose one filing (10-K or 10-Q) and read it carefully.</li>
+                    <li>Identify multiple related facts or numbers from different sections of the filing.</li>
+                    <li>Write a question that requires using all these facts to determine the answer.</li>
+                </ul>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>
+                For The Coca-Cola Company's year ended December 31, 2024, what was the year-over-year percentage change in Net Operating Revenues?</p>
+                <p><strong>Rational:</strong><br>
+                Although the question mentions YOY, it directly asks for the percentage increase, which is already explicitly stated in the Net Operating Revenues section of the filing.<br>
+                The answer can be taken directly from a single line in the report.<br>
+                The question asks for a stated figure rather than requiring computation, it is a Category A question, not Category B.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>
+                For the fiscal year ended December 31, 2024, what percentage of Coca‑Cola’s net operating revenues was consumed by its Cost of Goods Sold?</p>
+                <p><strong>Rational:</strong><br>
+                This question requires linking two separate numbers from two sections in the filing, the Net Operating Revenues and the COGS, and performing a calculation to find a percentage that is not explicitly stated in the report.</p>
+
+                <h3>3. Category C: hard questions using multiple reports</h3>
+                <p>In Category C, you will create advanced questions that require using information from two or more SEC filings. These filings may belong to the same company across different periods or to multiple companies, often within the same sector.<br>
+                The answer cannot be derived from a single document and requires cross-document analysis, comparison, or aggregation.</p>
+                <p><strong>How to work on a Category C task:</strong></p>
+                <ul>
+                    <li>Use 2 to 40 SEC filings (10-Ks and/or 10-Qs).</li>
+                    <li>Extract related facts or numbers from each filing.</li>
+                    <li>Write a question that cannot be answered using one report alone.</li>
+                </ul>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>
+                How did Coca-Cola’s net operating revenue change between 2023 and 2024?</p>
+                <p><strong>Rational:</strong><br>
+                Although this question involves two years, both figures are available within the same 2024 filing.<br>
+                The comparison can be completed using one document, so it does not meet the requirement of using multiple reports.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>
+                Between Coca-Cola and PepsiCo, which company had a higher net operating revenue growth rate in 2024 compared to 2023?</p>
+                <p><strong>Rational:</strong><br>
+                This question requires:<br>
+                Using at least two different filings (one for Coca-Cola and one for PepsiCo).<br>
+                Extracting revenue figures from each company’s filings.<br>
+                Calculating year-over-year growth for both companies.<br>
+                Comparing the results to reach a conclusion.<br>
+                Because the answer depends on information from multiple reports and companies, and involves computation and comparison, this is a true Category C question.</p>
+
+                <h2>✍️ How to Write a High-Quality Prompt</h2>
+                <p>A good prompt is the foundation of a high-quality work. Below are the key characteristics every prompt must have.</p>
+                
+                <h3>1. Clear and Specific</h3>
+                <p>The prompt should clearly state what information is being asked for without being vague, subjective, or ambiguous. Unclear prompts lead to incorrect or inconsistent answers.</p>
+                <p>Clear question = clear single answer from the filing. No room for subjectivity.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>What was the company’s total revenue for the fiscal year ended December 31, 2024?</p>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>Tell me about the company’s performance.</p>
+                <p><strong>Rational:</strong><br>This prompt is too broad and unclear. It does not specify: Which financial metric is required, Which time period to focus on. 20 possible answers exist.</p>
+
+                <h3>2. Self-Contained and complete</h3>
+                <p>The prompt should make sense on its own without needing additional context or external information. A self-contained prompt ensures anyone reading it can understand and answer it based solely on the filing.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>What were Apple Inc.’s total sales for the first quarter of 2025?</p>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>1- How did Tesla's research and development spending in 2023 compare to Ford's?</p>
+                <p><strong>Rational:</strong><br>It doesn’t specify how to compare: does it want the absolute difference in dollars, the percentage, or the ratio of spending to profit? The question is clear but incomplete.</p>
+                <p>2- What were the sales for Q1 2024?</p>
+                <p><strong>Rational:</strong><br>It doesn’t specify which company to refer to.</p>
+
+                <h3>3. Time-Specific</h3>
+                <p>The prompt must include clear, explicit dates or periods. Avoid vague words like “currently,” “now,” or “at that time.”</p>
+                <p>Prompts will be used later, so vague time references can become unclear or misleading.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>What was the company’s operating margin for the fiscal year ended December 31, 2024?</p>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>What is the company’s operating margin right now?</p>
+                <p><strong>Rational:</strong><br>“Right now” is vague and can change over time</p>
+
+                <h2>🚨Important Note</h2>
+                <p>When writing the prompt, do not mention the filing type (10-K / 10-Q) or the filing date explicitly in the question.</p>
+                <p><strong>Why this matters:</strong></p>
+                <p>Our goal is to use this data (the prompts) to test the AI model's ability to identify and extract the correct information from the correct SEC filings. Including the filing type or filing date makes the task easier for the AI models. Our goal is to test whether the model can correctly locate and use the relevant report on its own, not to guide it directly to the answer.</p>
+                <p>Instead, make the question time-specific (for example, by referencing the fiscal year or period). This keeps the prompt natural and realistic while still being precise.</p>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>What was the company’s total revenue according to the Form 10-K filed on March 3, 2025?</p>
+                <p><strong>Why it’s bad:</strong><br>The filing type and filing date are explicitly stated, which guides the AI directly to the correct report.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>What was the company’s total revenue for the fiscal year ended December 31, 2024?</p>
+                <p><strong>Why it’s good:</strong><br>The question is time-specific without revealing the filing type or filing date, making it more natural and more challenging.</p>
+
+                <h3>4. Verifiable from the Filing Only</h3>
+                <p>The prompt must be answerable entirely using information explicitly stated in the SEC filing. No assumptions, outside knowledge, or research should be needed. This ensures answers are factual, verifiable, and consistent, and avoids introducing errors or personal opinions.</p>
+                <p><strong>Example (<span class="text-good">Good</span>):</strong><br>What specific risks did the company highlight in the Risk Factors section for the fiscal year ended December 31, 2024?</p>
+                <p><strong>Example (<span class="text-bad">Bad</span>):</strong><br>Do you think the CEO is doing a good job in allocating capital?</p>
+                <p><strong>Rational:</strong><br>Requires judgment, not directly stated in the filing. Cannot be answered factually from the report alone. Introduces subjectivity and inconsistency.</p>
+
+                <h3>5. Matches the Required Difficulty Category</h3>
+                <p>The complexity of the prompt should align with its category (A, B, or C).</p>
+                <p><strong>Category A: Simple question (single document)</strong><br>
+                “What was Coca‑Cola’s total revenue for fiscal year 2024?”<br>
+                All we need is one filing (Apple’s 10-K for 2024), and one section (the Consolidated Statements of Operations).</p>
+
+                <p><strong>Category B: Complex question (single document)</strong><br>
+                “For the quarter ended September 28, 2024, calculate Apple’s inventory turnover ratio using cost of sales divided by average inventory (based on beginning and ending balances). Then calculate the receivables turnover ratio using net sales divided by average accounts receivable for the same period. Compare the two ratios and explain what the difference indicates about the company’s inventory management versus credit management efficiency.”<br>
+                It requires using multiple sections within a single filing.<br>
+                To answer this question, we need: Income Statement section, Cost of sales, Net sales, Balance Sheet section, Beginning and ending inventory balances, Beginning and ending accounts receivable balances.</p>
+
+                <p><strong>Category C: Complex question (multiple reports)</strong><br>
+                “Compare the year-over-year revenue growth rates of Apple and Microsoft for fiscal 2024. Clearly indicate which company grew faster and by how much.”<br>
+                To compare year-over-year revenue growth rates for Apple and Microsoft for fiscal 2024, we need data from multiple filings for both companies across two fiscal years.<br>
+                Required filings and data:<br>
+                Apple 10-K for fiscal 2023 (to get Apple’s total revenue for 2023)<br>
+                Apple 10-K for fiscal 2024 (to get Apple’s total revenue for 2024)<br>
+                Microsoft 10-K for fiscal 2023 (to get Microsoft’s total revenue for 2023)<br>
+                Microsoft 10-K for fiscal 2024 (to get Microsoft’s total revenue for 2024)</p>
+
+                <button class="collapsible-btn">✔️ Good and ❌ Bad prompt examples ⇩</button>
+                <div class="collapsible-content">
+                    <table class="instruction-table">
+                        <thead>
+                            <tr>
+                                <th>Score</th>
+                                <th>Prompt</th>
+                                <th>Rational</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-bad">
+                                <td>🔴 Bad</td>
+                                <td>What is the company’s operating margin?</td>
+                                <td>Not time-specific: missing the relevant period</td>
+                            </tr>
+                            <tr class="bg-good">
+                                <td>🟢 Good</td>
+                                <td>For the fiscal year ended December 31, 2024, calculate the company’s operating margin by dividing operating income by net operating revenues.</td>
+                                <td>Time-specific, verifiable, complete, and clearly stated.</td>
+                            </tr>
+                            <tr class="bg-bad">
+                                <td>🔴 Bad</td>
+                                <td>How much revenue did the company generate from its top 3 customers in 2024?</td>
+                                <td>Not answerable using the filing only: The 10-K/10-Q does not disclose revenue by individual customers, so the exact figure cannot be determined from the report.</td>
+                            </tr>
+                            <tr class="bg-good">
+                                <td>🟢 Good</td>
+                                <td>What was the company’s net cash provided by operating activities for the fiscal year ended June 30, 2024?</td>
+                                <td>Time-specific, verifiable, complete, and clearly stated.</td>
+                            </tr>
+                            <tr class="bg-bad">
+                                <td>🔴 Bad</td>
+                                <td>Tell me about the company’s performance in 2024.</td>
+                                <td>Missing clarity: It doesn’t specify which metric, section of the filing, or type of performance to focus on</td>
+                            </tr>
+                            <tr class="bg-good">
+                                <td>🟢 Good</td>
+                                <td>How much did the company spend on research and development in Q1 2024, and how does this compare in dollars to Q1 2023?</td>
+                                <td>It is time-specific, verifiable, self-contained, and clearly states the comparison metric (dollars).</td>
+                            </tr>
+                            <tr class="bg-bad">
+                                <td>🔴 Bad</td>
+                                <td>What was the company’s total revenue according to the 10-K filed on January 15, 2024?</td>
+                                <td>It mentioned the filing type and date instead of clearly specifying the fiscal period.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>✍️ How to Write a High-Quality Response</h2>
+                <p>A high-quality response must follow specific guidelines to ensure it is accurate, clear, verifiable, and fully aligned with the question and the filing.</p>
+                <p><strong>Reference Question:</strong><br>
+                Calculate the year-over-year percentage change in Microsoft’s total revenue from fiscal year 2023 to fiscal year 2024. Indicate whether revenue increased or decreased and report the exact percentage change.</p>
+                
+                <p><span class="highlight-gray">All responses below relate to this question 👆</span></p>
+                
+                <p>A high-quality response must be:</p>
+
+                <h3>1. Self-Contained & complete</h3>
+                <p>The response must make sense on its own, without needing additional context. This ensures anyone reading the answer can understand it without referring back to other documents or sources.</p>
+                <p><strong>Incomplete answer</strong><br>
+                Microsoft’s total revenue increased from fiscal year 2023 to fiscal year 2024, representing a year-over-year growth of 15.67%. This percentage is calculated by taking the difference between the 2024 and 2023 revenues, dividing it by the 2023 revenue, and multiplying by 100 to express it as a percentage. This growth highlights Microsoft’s strong business performance across its segments, including gains in Intelligent Cloud, Productivity and Business Processes, and More Personal Computing.</p>
+                <p><strong>Rationale:</strong><br>
+                Exact revenue figures missing.<br>
+                The precise numbers for 2023 and 2024 are omitted, so the reader cannot independently verify or contextualize the percentage growth.</p>
+
+                <h3>2. Time-Specific</h3>
+                <p>Responses must reference specific dates or periods mentioned in the filing and the prompt. Avoid vague terms like “currently” or “recently.” Clear time references make the answers precise and verifiable.</p>
+                <p><strong>Not time-specific response</strong><br>
+                Microsoft’s total revenue increased from $211,915 million to $245,122 million, representing a year-over-year growth of 15.67%. This percentage is calculated by taking the difference between the two revenues ($245,122 − $211,915 = $33,207 million), dividing it by the starting revenue ($33,207 ÷ $211,915), and multiplying by 100 to express it as a percentage (≈15.67%). This growth highlights Microsoft’s strong business performance across its segments, including gains in Intelligent Cloud, Productivity and Business Processes, and More Personal Computing.</p>
+                <p><strong>Rational:</strong><br>
+                This response is not time-specific because it does not mention the fiscal years. Without the dates, a reader cannot determine exactly which periods the revenue figures and growth rate refer to.</p>
+
+                <h3>3. Accurate and Fact-Based</h3>
+                <p>The response must reflect exactly what is stated in the filing. Do not add personal opinions, assumptions, or extra information.</p>
+                <p><strong>Inaccurate and not fact-based response</strong><br>
+                I believe Microsoft’s total revenue increased from roughly $210 billion to about $245 billion, representing an approximate year-over-year growth of around 15-16%. This percentage is calculated by taking the difference between the estimated revenues for the two years (≈$35 billion), dividing it by the starting revenue (≈$210 billion), and multiplying by 100 to get an approximate percentage. This growth seems to reflect strong performance across Microsoft’s segments, including gains in Intelligent Cloud, Productivity and Business Processes, and More Personal Computing.</p>
+                <p><strong>Rational:</strong><br>
+                This response is not accurate and fact-based because it uses approximate numbers rather than the exact reported revenue figures. Using “roughly” and “I believe” makes the answer less precise and prevents independent verification.</p>
+
+                <h3>4. Clear and Concise</h3>
+                <p>The response should be easy to read and directly answer the question without unnecessary words or repetition. A clear response reduces confusion and improves usability of the question-answer pair.</p>
+                <p><strong>Not clear response</strong><br>
+                When looking at Microsoft’s overall performance, and considering various market dynamics, and also keeping in mind that there are multiple contributing factors in the tech sector, Microsoft’s total revenue increased from $211,915 million in fiscal year 2023 to $245,122 million in fiscal year 2024, representing a year-over-year growth of 15.67%. This percentage is calculated by taking the difference between the 2024 and 2023 revenues ($245,122 − $211,915 = $33,207 million), dividing it by the 2023 revenue ($33,207 ÷ $211,915), and multiplying by 100 to express it as a percentage (≈15.67%). This growth highlights Microsoft’s strong business performance across its segments, including gains in Intelligent Cloud, Productivity and Business Processes, and More Personal Computing.</p>
+                <p><strong>Rational:</strong><br>
+                This response is not clear because it includes unnecessary introductory commentary that does not add value and makes the core information harder to extract quickly.</p>
+
+                <h3>5. Humanized</h3>
+                <p>Your answer should read like it was written by a real person who understands finance, not like a machine or copied template. Use the data from the report to explain the numbers, trends, or changes in a natural, professional way. Context should clarify the meaning of the information and show analytical thinking, but do not include personal opinions or outside knowledge. Humanized responses are easier to read, more trustworthy, and provide meaningful insights directly from the filing.</p>
+                <p><strong>machinized response</strong><br>
+                Microsoft’s total revenue for fiscal year 2023 = $211,915 million<br>
+                Microsoft’s total revenue for fiscal year 2024 = $245,122 million<br>
+                Year-over-year change = $245,122 − $211,915 = $33,207 million<br>
+                Percentage change = ($33,207 ÷ $211,915) × 100 ≈ 15.67%<br>
+                Revenue increased by 15.67%</p>
+                <p><strong>Rationale:</strong><br>
+                This response is machine-style: all information is presented as raw data and calculation steps. There is no interpretation, context, or humanized explanation.</p>
+                <p><strong>🟢 High-Quality Response example:</strong></p>
+                <p>Microsoft’s total revenue increased from $211,915 million in fiscal year 2023 to $245,122 million in fiscal year 2024, representing a year-over-year growth of 15.67%. This percentage is calculated by taking the difference between the 2024 and 2023 revenues ($245,122 − $211,915 = $33,207 million), dividing it by the 2023 revenue ($33,207 ÷ $211,915), and multiplying by 100 to express it as a percentage (≈15.67%). This growth highlights Microsoft’s strong business performance across its segments, including gains in Intelligent Cloud, Productivity and Business Processes, and More Personal Computing.</p>
+                <p><strong>Rationale:</strong><br>
+                This response demonstrates all key qualities of a high-quality answer: self-contained, time-specific, accurate, clear, concise, and humanized.<br>
+                Self-contained: Includes all numbers and calculations needed to understand the growth.<br>
+                Time-specific: Clearly mentions fiscal years 2023 and 2024.<br>
+                Accurate & fact-based: Uses precise reported figures.<br>
+                Clear & concise: No unnecessary filler text.<br>
+                Humanized: Adds context to the numbers, linking growth to Microsoft’s segments and strategy.</p>
+
+                <h2>🔗 Add Citations to your response</h2>
+                <p>A citation is a short marker (such as a number or letter) added immediately after any fact, figure, statement, or information taken from the filing. It tells the reviewer exactly where that information appears in the document.</p>
+                <p>Citations are required for all factual information to ensure accuracy and verifiability.<br>
+                <strong>Citation Rules:</strong></p>
+                <ul>
+                    <li>Use numbers (1), (2), (3)… OR letters (a), (b), (c)…</li>
+                    <li>Put them in Parentheses () or Brackets [] , like (1) or [a].</li>
+                    <li>ALWAYS place it immediately after the fact, e.g., “Revenue was $10M (1)” or “Growth slowed [b]”.</li>
+                    <li>Each citation marker must have a matching entry in the References section.</li>
+                </ul>
+
+                <h3>Why Citations Are Required</h3>
+                <p>Citations allow reviewers to:</p>
+                <ul>
+                    <li>Verify the accuracy of the information.</li>
+                    <li>Locate the exact place where the information appears in the filing.</li>
+                    <li>Ensure consistency and reliability across responses.</li>
+                </ul>
+                <p>Without citations, the information cannot be validated.</p>
+                <p><strong>Examples:</strong></p>
+                <p><strong><span class="text-good">Good</span>:</strong> “Net sales rose 12% (1).”</p>
+                <p><strong><span class="text-bad">Bad</span>:</strong> “Net sales rose 12%.”</p>
+                <p>No citation is provided, so the information cannot be verified.</p>
+                <p><a href="#">Click here for more information on how to add citations</a></p>
+
+                <h3>How to Add References</h3>
+                <p>To write a reference, open the Table of Contents (usually the first 1-3 pages of the filing) and use the following format:</p>
+                <ul>
+                    <li>Part number (if shown): e.g., Part II</li>
+                    <li>Item number (always): e.g., Item 7</li>
+                    <li>Item name (always): e.g., MD&A</li>
+                    <li>Page number (always): e.g., p.22</li>
+                    <li>Extra (optional): e.g., para 2, Table 3</li>
+                </ul>
+                <p>. If you are working on a Category C task, you must follow the format above and also include:</p>
+                <ul>
+                    <li>The type of the SEC form: e.g., 10-K</li>
+                    <li>The filing date: e.g., (Nov. 3,2024)</li>
+                </ul>
+                <p>Given this citation in a response: “Net sales rose 12% [b]”</p>
+                <p>. Example of <span class="text-good">good</span> referencing for category A or B:</p>
+                <p>[b] Part II, Item 7, MD&A, p.22</p>
+                <p>. Example of <span class="text-good">good</span> referencing for category C:</p>
+                <p>[b] Part II, Item 7, MD&A, p.22, 10-K, (Nov. 3,2024)</p>
+
+                <h3>Using Multiple References for One Fact</h3>
+                <p>Sometimes, a single fact or number in your response is based on more than one source.<br>
+                This usually happens when the value is calculated, inferred, or derived using multiple parts of one filing or multiple filings.<br>
+                In this case, you must cite all sources used to build that fact.</p>
+                <p><strong>How to cite a fact based on multiple sources</strong></p>
+                <p>If the fact in your response is derived from several sources, write it like this in the answer:</p>
+                <p>(Fact)[1][2][3]</p>
+                <p>Each citation marker refers to a different source used to reach that result.</p>
+
+                <h3>How to write the References section</h3>
+                <p><strong>Case 1: The fact is Not explicitly stated in any single source (calculated or inferred)</strong></p>
+                <p>If the fact in your response does not appear verbatim in any filing and is the result of combining or calculating information:</p>
+                <p>In the References section, you must:</p>
+                <ul>
+                    <li>Start with the citation marker.</li>
+                    <li>Briefly state the specific information taken from that source.</li>
+                    <li>Then write the full reference using the required format.</li>
+                </ul>
+                <p><strong>Example structure:</strong></p>
+                <p>[1] Net operating revenues: 3.5 million dollars<br>
+                Part II, Item 7, MD&A, p.22, 10-K, (Nov. 3, 2024)</p>
+                <p>[2] Cost of Goods Sold: 1.9 million dollars<br>
+                Part II, Item 8, Financial Statements, p.45, 10-K, (Nov. 3, 2024)</p>
+                <p>[3] Operating expenses: 2.1 million dollars<br>
+                Part II, Item 7, MD&A, p.30, 10-K, (Nov. 3, 2024)</p>
+                <p>This makes it clear how the final fact was constructed and where each input came from.</p>
+                <p><strong>Case 2: The fact Is explicitly stated in the source</strong></p>
+                <p>If the exact fact or number written in your response appears exactly as-is in the filing, do not restate the fact in the References section. Simply write the citation marker, followed by the reference.</p>
+                <p><strong>Example:</strong></p>
+                <p>[1] Part II, Item 7, MD&A, p.22, 10-K, (Nov. 3, 2024)</p>
+                <p><strong>Summary</strong></p>
+                <p>Calculated or inferred fact → explain what was taken from each source before the reference.<br>
+                Directly stated fact → reference only, no explanation needed.</p>
+
+                <h2>📂 Required Report Documentation</h2>
+                <p>After completing the prompt, response, and references, you must document every SEC filing you used to create the prompt and the response.</p>
+                <p><strong>Category A & Category B</strong></p>
+                <p>You will use one single SEC report, so you only need to complete the documentation once.</p>
+                <p><strong>Category C</strong></p>
+                <p>You will use 2 up to 40 different reports.<br>
+                Determine the number of reports used, then complete separate documentation for each.</p>
+                <p><strong>How to access and save the filing</strong></p>
+                <ul>
+                    <li>Click on the filing ➡️ Click “Open filing”.</li>
+                    <li>In the Document Format Files section, locate the row for the selected filing type (10-K or 10-Q) ➡️ Click the link next to it (The correct link will be labeled iXBRL).</li>
+                    <li>Click Menu ➡️ ️Select Open as HTML ➡️ Copy and save the HTML URL.<br>
+                    The link you copied should look like this:<br>
+                    https://www.sec.gov/Archives/edgar/data/[CIK]/[AccessionNumber]/[FILENAME].htm</li>
+                    <li>Save the filing as a PDF:<br>
+                    Right-click anywhere on the page ➡️ Click Print ➡️ Set destination to Save as PDF ➡️ Save the file to your device.</li>
+                </ul>
+                <p><strong>Required Documentation Details</strong></p>
+                <p>For each SEC report, you must provide the following information:</p>
+                <ul>
+                    <li>Company Name: e.g., Coca-Cola (The official legal entity name, exactly as shown in the filing)<br>
+                    Note: Make sure the name matches the entity you selected, not just the name you searched for.</li>
+                    <li>Ticker Symbol: e.g., KO</li>
+                    <li>Central Index Key (CIK): e.g., 0000021344</li>
+                    <li>Filing Type (10-K or 10-Q)</li>
+                    <li>Filing Date: (The date the filing was published).</li>
+                    <li>Reporting Period: (The fiscal period covered by the filing).</li>
+                    <li>SEC EDGAR HTML URL</li>
+                    <li>Saved PDF File</li>
+                </ul>
+                
+                <p><strong class="note-red">Notes (Category C):</strong></p>
+                <ul>
+                    <li>Every SEC filing used in the prompt and the response must have complete documentation.</li>
+                    <li>Any report used without documentation, or documented without being used and cited, will invalidate the task and result in removal from the project.</li>
+                    <li>The number of documented reports must exactly match the number of SEC filings used.<br>
+                    Example: If 3 filings are used, exactly 3 reports must be documented. NO more, NO less.</li>
+                    <li>Each documented report must be referenced with at least one citation in the response.</li>
+                </ul>
+
+                <h2>🚨Important Notes</h2>
+                <ul>
+                    <li>Do not use any of the examples provided in the instructions. We want to see your creativity and original work.</li>
+                    <li>Do not reuse the same documents across multiple tasks, even if the prompts differ. For best results, ensure each task uses filings from different companies to maintain diversity.</li>
+                    <li>The prompt, response, references, and anything you write for the task must be only in English.</li>
+                </ul>
+
+                <h2>🔍 Before you submit a task, make sure:</h2>
+                <ul>
+                    <li>Your prompt and response do not contain any PII (Personally Identifiable Information).</li>
+                    <li>Your prompt is clear, specific, self-contained, time-specific, verifiable from the filing only, and matches the assigned prompt category.</li>
+                    <li>Your response is self-contained, time-specific, accurate and fact-based, clear and concise, humanized, and includes citations.</li>
+                    <li>All references are properly formatted and complete.</li>
+                    <li>Your documentation is complete and accurate, and you have documented every filing used in your prompt and response.</li>
+                </ul>
+
+                <button class="collapsible-btn">❓ FAQ</button>
+                <div class="collapsible-content">
+                    <p><strong>Q: What if a filing is updated or corrected after I started my task?</strong></p>
+                    <p>A: This is very rare, but if a filing is updated or corrected before you submit a task, note the change in the comment section and clearly indicate which version of the filing you used, either the original or the updated version. Ensure that all information in your prompt, response, and citations exactly matches the PDF you uploaded.</p>
+                    
+                    <p><strong>Q: Can I use visual data, such as charts, graphs, or tables, from the filings in my response?</strong></p>
+                    <p>A: No. Do not copy charts, graphs, or tables directly from the filings. Your response should be humanized and written in your own words. Use the data from the filings to explain trends, numbers, or changes clearly and in an organized manner, but present it as original text rather than visuals.</p>
+
+                    <p><strong>Q: Are there preferred formats for presenting computations or ratios?</strong></p>
+                    <p>A: Yes. Use clear and consistent formatting:<br>
+                    Division: (numerator ÷ denominator)<br>
+                    Multiplication: ×<br>
+                    Approximation: ≅ or ~<br>
+                    Percentages: include %<br>
+                    Keep spacing consistent and include units when relevant<br>
+                    Present formulas naturally within a humanized explanation</p>
+
+                    <p><strong>Q: Can I use accounting terms that are different from those in the filing as long as they have the same meaning?</strong></p>
+                    <p>A: Yes, you can use different accounting terms if they convey the same meaning. Not all companies use identical terminology; for example, “Net Revenue” in one report might be called “Total Sales” in another. What matters is that the concept and intent of the question remain clear, and any calculations or answers accurately reflect the data in the filing.</p>
+
+                    <p><strong>Q: How should I handle international companies with different fiscal year reporting dates?</strong></p>
+                    <p>A: Not all companies have fiscal years that start in January and end in December. Always use the actual fiscal period reported in the filing when writing your prompt and response. Avoid general terms like “last year”; instead, reference the precise start and end dates of the company’s fiscal year to ensure clarity, accuracy, and consistency.</p>
+
+                    <p><strong>Q: Can I use a filing published after October 2023 but covering a fiscal period before October 2023?</strong></p>
+                    <p>A: Yes, you can use it. However, try to prioritize the most recent filings whenever possible.</p>
+
+                    <p><strong>Q: What if the filing is extremely long, do I need to check every section?</strong></p>
+                    <p>A: You don’t need to read every single section of the filing. Focus on the key sections that are relevant to the prompt and the facts you need.</p>
+
+                    <p><strong>Q:  Can I use LLMs to help me write the prompt or the answer?</strong></p>
+                    <p>A: No. Using LLMs in any way, even to improve writing or generate ideas, will result in removal from the project and the platform. All prompts and answers must be entirely original and human-written.</p>
+
+                    <p><strong>Q: How much time should I spend on a task?</strong></p>
+                    <p>A: There is no specific AHT because each task varies depending on the question’s complexity and the number of filings used. Take all the time you need to produce a high-quality submission: we prefer quality over quantity or speed. Report the time you actually spent. Do not abuse the reported time, as this will result in removal from the platform.</p>
+                </div>
+                
+                <br><br>
+            </div>
+        </aside>
+
+        <section class="task-panel" id="task-form">
+            
+            <div class="category-badge">
+                Your assigned category is: Category A
+            </div>
+
+            <h2 class="section-title">✍️ Fill in your work</h2>
+
+            <div class="step-container">
+                <span class="step-label">Step 1: Write a prompt that matches your assigned category</span>
+                <input type="text" placeholder="">
+                
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="check1">
+                    <label for="check1">I confirm my prompt matches the assigned category</label>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <span class="step-label">Step 2: Write the response that fully answers the prompt</span>
+                <textarea placeholder=""></textarea>
+                
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="check2">
+                    <label for="check2">I confirm that my response is complete, time specific, and accurate</label>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <span class="step-label">Step 3: References</span>
+                <p style="font-size: 0.85rem; color: #666; margin-top:-5px;">Add one box per citation marker</p>
+                
+                <div id="references-list">
+                    <input type="text" placeholder="" style="margin-bottom: 10px;">
+                </div>
+
+                <button type="button" class="add-btn" onclick="addReference()">+</button>
+
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="check3">
+                    <label for="check3">I confirm that each reference includes only one citation marker and is linked to the correct source</label>
+                </div>
+            </div>
+
+            <div class="step-container">
+                <span class="step-label">Step 4: Filing Documentation</span>
+                <p style="font-size: 0.85rem; color: #666;">Add documentation for each SEC filing used. Click “+” for additional filings (Category C).</p>
+
+                <div id="documentation-list">
+                    <div class="doc-entry">
+                        <div class="doc-grid">
+                            <div>
+                                <label class="small-label">1- Company legal name (official)</label>
+                                <input type="text" placeholder="e.g., Coca-Cola">
+                            </div>
+                            <div>
+                                <label class="small-label">2- Ticker Symbol</label>
+                                <input type="text" placeholder="e.g., KO">
+                            </div>
+                            <div>
+                                <label class="small-label">3- Central Index Key (CIK)</label>
+                                <input type="text" placeholder="e.g., 0000021344">
+                            </div>
+                            <div>
+                                <label class="small-label">4- Filing Type</label>
+                                <select>
+                                    <option value="" disabled selected>Select Filing Type</option>
+                                    <option value="10-K">10-K</option>
+                                    <option value="10-Q">10-Q</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="small-label">5- Filing Date</label>
+                                <input type="text" placeholder="e.g., 2024-02-20">
+                            </div>
+                            <div>
+                                <label class="small-label">6- Fiscal reporting period</label>
+                                <input type="text" placeholder="e.g., Fiscal year ended December 31, 2024">
+                            </div>
+                            <div class="full-width">
+                                <label class="small-label">7- SEC EDGAR HTML URL</label>
+                                <input type="text" placeholder="https://www.sec.gov/Archives/edgar/data/[CIK]/[AccessionNumber]/[FILENAME].htm">
+                            </div>
+                            <div class="full-width">
+                                <label class="small-label">8- Upload the PDF file</label>
+                                <input type="file" accept="application/pdf">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="add-btn" onclick="addDocEntry()">+</button>
+
+                <div class="checkbox-wrapper" style="margin-bottom: 5px;">
+                    <input type="checkbox" id="check4a">
+                    <label for="check4a">I confirm that the uploaded file(s) are 10-K or 10-Q filings filed after October 1, 2023</label>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="check4b">
+                    <label for="check4b">I confirm that I documented all and only the filings used in this task</label>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="comment-section">
+                <label style="font-weight: bold; color: var(--text-dark); display:block; margin-bottom:5px;">If you have any concerns about the task please leave a comment:</label>
+                <div class="comment-box">
+                    <input type="text" placeholder="Type your comment here..." id="commentInput">
+                    <button class="send-btn" onclick="sendComment()">➤</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-submit" onclick="submitTask()">
+                    <span>Submit</span>
+                    <span>✓</span>
+                </button>
+
+                <button class="btn-clear" onclick="clearResponse()">
+                    Clear response
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Collapsible Logic
+        var coll = document.getElementsByClassName("collapsible-btn");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight){
+              content.style.maxHeight = null;
+            } else {
+              content.style.maxHeight = content.scrollHeight + "px";
+            } 
+          });
+        }
+
+        function addReference() {
+            const container = document.getElementById('references-list');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = '';
+            input.style.marginBottom = '10px';
+            input.style.opacity = '0';
+            container.appendChild(input);
+            setTimeout(() => { input.style.opacity = '1'; }, 100);
+        }
+
+        function addDocEntry() {
+            const container = document.getElementById('documentation-list');
+            const div = document.createElement('div');
+            div.className = 'doc-entry';
+            div.innerHTML = `
+                <button class="remove-btn" onclick="this.parentElement.remove()">✕ Remove</button>
+                <div class="doc-grid">
+                    <div>
+                        <label class="small-label">1- Company legal name (official)</label>
+                        <input type="text" placeholder="e.g., Coca-Cola">
+                    </div>
+                    <div>
+                        <label class="small-label">2- Ticker Symbol</label>
+                        <input type="text" placeholder="e.g., KO">
+                    </div>
+                    <div>
+                        <label class="small-label">3- Central Index Key (CIK)</label>
+                        <input type="text" placeholder="e.g., 0000021344">
+                    </div>
+                    <div>
+                        <label class="small-label">4- Filing Type</label>
+                        <select>
+                            <option value="" disabled selected>Select Filing Type</option>
+                            <option value="10-K">10-K</option>
+                            <option value="10-Q">10-Q</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="small-label">5- Filing Date</label>
+                        <input type="text" placeholder="e.g., 2024-02-20">
+                    </div>
+                    <div>
+                        <label class="small-label">6- Fiscal reporting period</label>
+                        <input type="text" placeholder="e.g., Fiscal year ended December 31, 2024">
+                    </div>
+                    <div class="full-width">
+                        <label class="small-label">7- SEC EDGAR HTML URL</label>
+                        <input type="text" placeholder="https://www.sec.gov/Archives/edgar/data/[CIK]/[AccessionNumber]/[FILENAME].htm">
+                    </div>
+                    <div class="full-width">
+                        <label class="small-label">8- Upload the PDF file</label>
+                        <input type="file" accept="application/pdf">
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function clearResponse() {
+            if(confirm("Are you sure you want to clear all your work?")) {
+                const taskPanel = document.getElementById('task-form');
+                const inputs = taskPanel.querySelectorAll('input[type="text"], textarea, input[type="date"], input[type="file"]');
+                const selects = taskPanel.querySelectorAll('select');
+                const checkboxes = taskPanel.querySelectorAll('input[type="checkbox"]');
+                
+                inputs.forEach(input => input.value = '');
+                selects.forEach(select => select.selectedIndex = 0);
+                checkboxes.forEach(box => box.checked = false);
+            }
+        }
+
+        function submitTask() {
+            alert("Task Submitted Successfully! ✅");
+        }
+
+        function sendComment() {
+            const input = document.getElementById('commentInput');
+            if(input.value.trim() !== "") {
+                alert("Comment sent!");
+                input.value = "";
+            }
+        }
+    </script>
+
+</body>
+</html>
